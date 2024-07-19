@@ -656,21 +656,22 @@ QuestLogTitleButton_OnClick = function(self, button)
   QuestLog_Update()
 end
 
-if not GetQuestLink then -- Allow to send questlinks from questlog
-  local pfHookQuestLogTitleButton_OnClick = QuestLogTitleButton_OnClick
-  QuestLogTitleButton_OnClick = function(button)
-    local scrollFrame = EQL3_QuestLogListScrollFrame or ShaguQuest_QuestLogListScrollFrame or QuestLogListScrollFrame
-    local questIndex = this:GetID() + FauxScrollFrame_GetOffset(scrollFrame)
-    local questName, questLevel = compat.GetQuestLogTitle(questIndex)
-    local questids = pfDatabase:GetQuestIDs(questIndex)
-    local questid = questids and tonumber(questids[1]) or 0
+local pfHookQuestLogTitleButton_OnClick = QuestLogTitleButton_OnClick
+QuestLogTitleButton_OnClick = function(self, button)
+  pfHookQuestLogTitleButton_OnClick(self, button)
+  
+  local questIndex = self:GetID() + FauxScrollFrame_GetOffset(QuestLogListScrollFrame)
+  local questName, _, _, _, _, _, _, questID = compat.GetQuestLogTitle(questIndex)
+  local questObjectives = pfDatabase:GetQuestObjectives(questID)
 
-    if IsShiftKeyDown() and not this.isHeader and ChatFrameEditBox:IsVisible() then
-      pfQuestCompat.InsertQuestLink(questid, questName)
-      QuestLog_SetSelection(questIndex)
-      QuestLog_Update()
-      return
-    end
+  if IsShiftKeyDown() and not self.isHeader and ChatFrameEditBox:IsVisible() then
+    local questLink = pfQuestCompat.GetQuestLink(questID, questName)
+    ChatFrameEditBox:Insert(questLink .. " - " .. questObjectives)
+    QuestLog_SetSelection(questIndex)
+    QuestLog_Update()
+    return
+  end
+end
 
     pfHookQuestLogTitleButton_OnClick(button)
   end
