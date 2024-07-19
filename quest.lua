@@ -673,9 +673,6 @@ QuestLogTitleButton_OnClick = function(self, button)
   end
 end
 
-    pfHookQuestLogTitleButton_OnClick(button)
-  end
-
   -- Patch ItemRef to display Questlinks
   local pfQuestHookSetItemRef = SetItemRef
   SetItemRef = function(link, text, button)
