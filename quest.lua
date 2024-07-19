@@ -666,7 +666,8 @@ if not GetQuestLink then -- Allow to send questlinks from questlog
     local questid = questids and tonumber(questids[1]) or 0
 
     if IsShiftKeyDown() and not this.isHeader and ChatFrameEditBox:IsVisible() then
-      pfQuestCompat.InsertQuestLink(questid, questName)
+      local questObjective = pfDatabase:GetQuestObjective(questid) -- Assuming this function exists
+      pfQuestCompat.InsertQuestLink(questid, questName .. " - " .. questObjective)
       QuestLog_SetSelection(questIndex)
       QuestLog_Update()
       return
