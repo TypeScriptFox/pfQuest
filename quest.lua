@@ -656,7 +656,8 @@ QuestLogTitleButton_OnClick = function(self, button)
   QuestLog_Update()
 end
 
-local pfHookQuestLogTitleButton_OnClick = QuestLogTitleButton_OnClick
+if not GetQuestLink then -- Allow to send questlinks from questlog
+  local pfHookQuestLogTitleButton_OnClick = QuestLogTitleButton_OnClick
 QuestLogTitleButton_OnClick = function(self, button)
   pfHookQuestLogTitleButton_OnClick(self, button)
   
@@ -673,6 +674,9 @@ QuestLogTitleButton_OnClick = function(self, button)
   end
 end
 
+    pfHookQuestLogTitleButton_OnClick(button)
+  end
+
   -- Patch ItemRef to display Questlinks
   local pfQuestHookSetItemRef = SetItemRef
   SetItemRef = function(link, text, button)
@@ -682,8 +686,10 @@ end
     if isQuest or isQuest2 then
       if IsShiftKeyDown() and ChatFrameEditBox:IsVisible() then
         ChatFrameEditBox:Insert(text)
-        return
+      else
+        pfQuestHookSetItemRef(link, text, button)
       end
+    end 
 
       if ItemRefTooltip:IsShown() and ItemRefTooltip.pfQtext == text then
         HideUIPanel(ItemRefTooltip)
